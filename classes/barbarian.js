@@ -1,37 +1,6 @@
 'use strict';
 
-const modifiers = {
-    1: -5,
-    2: -4,
-    3: -4,
-    4: -3,
-    5: -3,
-    6: -2,
-    7: -2,
-    8: -1,
-    9: -1,
-    10: -0,
-    11: -0,
-    12: 1,
-    13: 1,
-    14: 2,
-    15: 2,
-    16: 3,
-    17: 3,
-    18: 4,
-    19: 4,
-    20: 5,
-    21: 5,
-    22: 6,
-    23: 6,
-    24: 7,
-    25: 7,
-    26: 8,
-    27: 8,
-    28: 9,
-    29: 9,
-    30: 10,
-};
+const PlayerClass = require('../player-class');
 
 /**
  * See barbarian.js for more on classes.
@@ -44,69 +13,63 @@ module.exports = srcPath => {
             1: { skills: ['rage', 'two weapon fighting'] },
         },
 
-        setupPlayer: player => {
-            player.addAttribute('strength', 17);
-            player.addAttribute('dexterity', 13);
-            player.addAttribute('constitution', 16);
-            player.addAttribute('intelligence', 10);
-            player.addAttribute('wisdom', 12);
-            player.addAttribute('charisma', 8);
+        setupPlayer: (state, player) => {
+            const cls = new PlayerClass(player, state);
+            cls.str = 17;
+            cls.dex = 13;
+            cls.con = 16;
+            cls.int = 10;
+            cls.wis = 12;
+            cls.cha = 8;
+            cls.hp = 15;
+            cls.ac = 14;
+            cls.hitdice = '1d12';
+            cls.level = 1;
+            cls.speed = 30;
+            cls.proficiency = 2;
+            cls.savingThrows = ['strength', 'constitution'];
+            cls.skillProficiencies = ['animal handling', 'nature'];
+            cls.armorProficiencies = ['Light Armor', 'Medium Armor', 'Shields'];
+            cls.toolProficiencies = [
+                'Brewers Supplies',
+                'Smiths Tools',
+                'Vehicles (Land)',
+            ];
+            cls.weaponProficiencies = ['Martial Weapons', 'Simple Weapons'];
+            cls.languageProficiencies = ['Common', 'Dwarvish'];
+            cls.defenses = ['Poison'];
 
-            player.setMeta('race', {
-                main: 'dwarf',
-                subrace: 'mountain',
-            });
+            cls.addWeapon(
+                'Greataxe',
+                '5ft',
+                +5,
+                '1d12+3',
+                'Slashing Damage, Martial, Two-Handed'
+            );
+            cls.addWeapon(
+                'Handaxe',
+                '20(60)ft',
+                +5,
+                '1d6+3',
+                'Slashing Damage, Simple, Light, Thrown, Range (20/60)'
+            );
+            cls.addWeapon(
+                'Javelin',
+                '30(120)ft',
+                +5,
+                '1d6+3',
+                'Piercing Damage, Simple, Thrown, Range (30/120)'
+            );
+            cls.addWeapon(
+                'Unarmed Strike',
+                '5ft',
+                +5,
+                '4',
+                'Bludgeoning Damage'
+            );
 
-            player.addAttribute('ac', 14);
-            player.setMeta('hit dice', {
-                quantity: 1,
-                die: 12,
-            });
-
-            player.addAttribute('level', 1);
-            player.addAttribute('speed', 30);
-            player.addAttribute('proficiency', 2);
-
-            // 12 + constitution modifier
-            player.setAttributeBase('health', 12 + modifiers[17]);
-            player.setMeta('proficiencies', ['animal handling', 'nature']);
-
-            player.setMeta('saving throw bonuses', {
-                strength: player.getAttribute('proficiency'),
-                constitution: player.getAttribute('proficiency'),
-            });
-
-            player.setMeta('saving throws', {
-                strength:
-                    modifiers[17] +
-                        player.getMeta('saving throw bonuses')['strength'] || 0,
-                intelligence:
-                    modifiers[17] +
-                        player.getMeta('saving throw bonuses')[
-                            'intelligence'
-                        ] || 0,
-                constitution:
-                    modifiers[17] +
-                        player.getMeta('saving throw bonuses')[
-                            'constitution'
-                        ] || 0,
-                dexterity:
-                    modifiers[17] +
-                        player.getMeta('saving throw bonuses')['dexterity'] ||
-                    0,
-                wisdom:
-                    modifiers[17] +
-                        player.getMeta('saving throw bonuses')['wisdom'] || 0,
-                charisma:
-                    modifiers[17] +
-                        player.getMeta('saving throw bonuses')['charisma'] || 0,
-            });
-
-            player.addAttribute('passive perception', 13);
-            player.addAttribute('passive investigation', 10);
-            player.addAttribute('passive insight', 11);
-
-            player.prompt = '[ %health.current%/%health.max% <b>hp</b> ]';
+            player.prompt =
+                '[ <b><red>%health.current%</red></b>/<red>%health.max%</red> <b>hp</b> ]';
         },
     };
 };

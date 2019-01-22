@@ -1,24 +1,19 @@
 'use strict';
 
+const PlayerClass = require('../player-class');
+
 module.exports = srcPath => {
     const Broadcast = require(srcPath + 'Broadcast');
 
     return {
         command: state => (value, player) => {
+            const cls = new PlayerClass(player, state);
+
             if (value) {
-                player.setMeta('ac', value);
+                cls.ac = value;
             }
 
-            const ac = player.getMeta('ac');
-
-            if (!ac) {
-                return Broadcast.sayAt(
-                    player,
-                    'No armor class value currently set.'
-                );
-            }
-
-            Broadcast.sayAtExcept(player, `armor class ${ac}`);
+            Broadcast.sayAtExcept(player, `armor class ${cls.ac}`);
         },
     };
 };
