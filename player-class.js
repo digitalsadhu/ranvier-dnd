@@ -659,7 +659,9 @@ module.exports = class PlayerClass {
         const weapons = this.player.getMeta('weapons') || [];
         this.player.setMeta(
             'weapons',
-            weapons.filter(weapon => weapon.name !== name)
+            weapons.filter(
+                weapon => weapon.name.toLowerCase() !== name.toLowerCase()
+            )
         );
     }
 
@@ -668,7 +670,9 @@ module.exports = class PlayerClass {
     }
 
     weapon(name) {
-        const weapons = this.weapons.filter(weap => weap.name === name);
+        const weapons = this.weapons.filter(
+            weap => weap.name.toLowerCase() === name.toLowerCase()
+        );
         if (weapons.length > 0) return weapons[0];
     }
 

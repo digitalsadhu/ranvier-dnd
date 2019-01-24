@@ -1,5 +1,6 @@
 'use strict';
 
+const { EventUtil } = require('ranvier');
 const PlayerClass = require('../player-class');
 
 module.exports = srcPath => {
@@ -8,21 +9,52 @@ module.exports = srcPath => {
     return {
         command: state => (input, player) => {
             const cls = new PlayerClass(player, state);
-            const s = msg => Broadcast.sayAtExcept(player, msg);
+            const s = msg => Broadcast.sayAtExcept(player.room, msg);
 
-            const [name, opt1, opt2] = input.split(' ');
+            let [name, opt1, opt2] = input.split(' ');
             let type = '';
             let advantageDisadvantageNotes = '';
             let sneakAttackNotes = '';
             let sneak = '';
 
             if (!name) {
-                return s(`attack using what?`);
+                const say = EventUtil.genSay(player.socket);
+                const write = EventUtil.genWrite(player.socket);
+
+                for (let i = 1; i <= cls.weapons.length; i++) {
+                    const w = cls.weapons[i];
+                    if (w && w.name && w.range && w.modifier && w.damage) {
+                        say(
+                            `[${i}] ${w.name} (range: ${w.range}, modifier: ${
+                                w.modifier
+                            }, damage: ${w.damage})`
+                        );
+                    }
+                }
+
+                write('<bold>What would you like to attack with?</bold> ');
+
+                player.socket.once('data', data => {
+                    const num = parseInt(data.toString(), 10);
+                    say('');
+                    const w = cls.weapons[num - 1];
+
+                    if (w) {
+                        state.CommandManager.get('attack').execute(
+                            w.name,
+                            player
+                        );
+                    }
+                });
+
+                return;
             }
+
+            name = name.toLowerCase();
 
             if (!cls.weapon(name)) {
                 return s(
-                    `invalid weapon, have you add ${name} to your weapons?`
+                    `invalid weapon, have you added ${name} to your weapons?`
                 );
             }
 
