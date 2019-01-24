@@ -5,9 +5,15 @@ const FeatureManager = require('./feature-manager');
 
 const manager = new FeatureManager();
 
-tap.test('featureByName', t => {
+tap.test('featureByName 1', t => {
     const feat = manager.featureByName('rage');
     t.equal(feat.name, 'Rage');
+    t.end();
+});
+
+tap.test('featureByName 2', t => {
+    const feat = manager.featureByName('unarmored defense');
+    t.equal(feat.name, 'Unarmored Defense');
     t.end();
 });
 
@@ -46,5 +52,34 @@ tap.test('featuresForPlayer', t => {
         subclass: 'berserker',
     });
     t.equal(feats[0].name, 'Rage');
+    t.equal(feats[1].name, 'Unarmored Defense');
+    t.equal(feats.length, 2);
+    t.end();
+});
+
+tap.test('featuresForPlayer: level 2 features', t => {
+    const feats = manager.featuresForPlayer({
+        level: 2,
+        class: 'wizard',
+    });
+    t.equal(feats[0].name, 'Spellcasting');
+    t.equal(feats[1].name, 'Arcane Recovery');
+    t.equal(feats[2].name, 'Arcane Tradition');
+    t.equal(feats.length, 3);
+    t.end();
+});
+
+tap.test('featuresForPlayer: level 2 features with subclass', t => {
+    const feats = manager.featuresForPlayer({
+        level: 2,
+        class: 'wizard',
+        subclass: 'evocation',
+    });
+    t.equal(feats[0].name, 'Spellcasting');
+    t.equal(feats[1].name, 'Arcane Recovery');
+    t.equal(feats[2].name, 'Arcane Tradition');
+    t.equal(feats[3].name, 'Evocation Savant');
+    t.equal(feats[4].name, 'Sculpt Spells');
+    t.equal(feats.length, 5);
     t.end();
 });
