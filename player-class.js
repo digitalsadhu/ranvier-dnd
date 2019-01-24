@@ -2,6 +2,8 @@
 
 const { DiceRoller } = require('rpg-dice-roller');
 const AttackRoll = require('./attack-roll');
+const FeatureManager = require('./feature-manager');
+const SpellManager = require('./spell-manager');
 
 const skills = {
     str: 'strength',
@@ -104,6 +106,8 @@ module.exports = class PlayerClass {
         this.player = player;
         this.state = state;
         this.roller = new DiceRoller();
+        this.featureManager = new FeatureManager();
+        this.spellManager = new SpellManager();
     }
 
     modifier(attr) {
@@ -442,16 +446,33 @@ module.exports = class PlayerClass {
         }
     }
 
-    get hp() {
+    get maxHp() {
+        return this.player.getBaseAttribute('health');
+    }
+
+    set maxHp(value) {
+        if (this.player.hasAttribute('health')) {
+            this.player.attributes.get('health').setBase(value);
+        } else {
+            const hp = this.state.AttributeFactory.create('health', value);
+            this.player.addAttribute(hp);
+        }
+    }
+
+    get currentHp() {
         return this.player.getAttribute('health');
     }
 
-    set hp(value) {
+    set currentHp(value) {
         if (this.player.hasAttribute('health')) {
-            this.player.setAttributeBase('health', value);
+            let diff = Math.abs(this.maxHp - value);
+            this.player.setAttributeToMax('health');
+            if (value < 0) diff = this.maxHp;
+            if (value < this.maxHp) this.player.lowerAttribute('health', diff);
+            else if (value > this.maxHp)
+                this.player.raiseAttribute('health', diff);
         } else {
-            const ac = this.state.AttributeFactory.create('health', value);
-            this.player.addAttribute(ac);
+            this.maxHp = value;
         }
     }
 
@@ -673,6 +694,18 @@ module.exports = class PlayerClass {
             notes,
             rolls: attackRoll,
         };
+    }
+
+    get features() {
+        return this.featureManager.featuresForPlayer(this);
+    }
+
+    get spells() {
+        return this.spellManager.spellsForPlayer(this);
+    }
+
+    save() {
+        return this.player.save();
     }
 
     // SECTION: ATTACKING AND SKILLS/SPELLS
