@@ -15,6 +15,7 @@ module.exports = srcPath => {
 
         setupPlayer: (state, player) => {
             const cls = new PlayerClass(player, state);
+            cls.class = 'barbarian';
             cls.str = 17;
             cls.dex = 13;
             cls.con = 16;

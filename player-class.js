@@ -270,6 +270,22 @@ module.exports = class PlayerClass {
         this.player.setMeta('subrace', subrace);
     }
 
+    get subclass() {
+        return this.player.getMeta('subclass') || null;
+    }
+
+    set subclass(subclass) {
+        this.player.setMeta('subclass', subclass);
+    }
+
+    get class() {
+        return this.player.getMeta('cclass') || null;
+    }
+
+    set class(cclass) {
+        this.player.setMeta('cclass', cclass);
+    }
+
     get str() {
         return this.player.getAttribute('str');
     }

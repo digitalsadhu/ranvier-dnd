@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "node-fetch": "^2.3.0",
     "rpg-dice-roller": "^2.0.0",
+    "tap": "^12.4.0",
     "voca": "^1.4.0"
   }
 }
