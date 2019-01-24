@@ -1,6 +1,7 @@
 'use strict';
 
 const { DiceRoller } = require('rpg-dice-roller');
+const AttackRoll = require('./attack-roll');
 
 const skills = {
     str: 'strength',
@@ -627,6 +628,35 @@ module.exports = class PlayerClass {
 
     get weapons() {
         return this.player.getMeta('weapons') || [];
+    }
+
+    weapon(name) {
+        const weapons = this.weapons.filter(weap => weap.name === name);
+        if (weapons.length > 0) return weapons[0];
+    }
+
+    attack(name, type = '', sneak = '') {
+        const { modifier, damage, notes, range } = this.weapon(name);
+
+        const attackRoll = new AttackRoll({
+            sneakAttack: sneak,
+            attackModifier: modifier,
+            damageDice: damage,
+            advantage: type === 'advantage',
+            disadvantage: type === 'disadvantage',
+        });
+
+        attackRoll.rollAttack();
+        attackRoll.rollDamage();
+
+        return {
+            name,
+            range,
+            modifier,
+            damage,
+            notes,
+            rolls: attackRoll,
+        };
     }
 
     // SECTION: ATTACKING AND SKILLS/SPELLS
